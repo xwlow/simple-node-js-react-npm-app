@@ -1,9 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
+import React from 'react';
 
 function App() {
+  // Unused variable
+  const unused = 42;
+
+  // Hardcoded credential (security issue)
+  const password = "supersecret";
+
+  // Use of eval (security issue)
+  eval("console.log('Eval is dangerous!')");
+
   return (
-    <div className="App">
+    <div className="App" style={{ backgroundColor: 'red' }}>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>

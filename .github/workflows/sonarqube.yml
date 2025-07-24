@@ -10,6 +10,16 @@ jobs:
   sonarqube:
     name: Analyze with SonarQube
     runs-on: ubuntu-latest
+    services:
+      sonarqube:
+        image: sonarqube:latest
+        ports:
+          - 9000:9000
+        options: >
+          --health-cmd="curl -f http://localhost:9000 || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout repository
@@ -23,8 +33,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Wait for SonarQube to be ready
+        run: |
+          for i in {1..30}; do
+            curl -s http://sonarqube:9000/api/system/health | grep -q 'UP' && break
+            echo "Waiting for SonarQube..."
+            sleep 10
+          done
+
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: http://sonarqube:9000
